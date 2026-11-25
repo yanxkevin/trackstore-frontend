@@ -8,5 +8,5 @@ export interface Album {
   imagem: string;
   descricao: string;
   faixas: string[];
-  quantidade?: number;
+  adicionado?: boolean; // <-- Adicione esta linha
 }

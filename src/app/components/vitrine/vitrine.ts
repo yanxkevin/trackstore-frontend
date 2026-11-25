@@ -23,43 +23,43 @@ export class VitrineComponent implements OnInit {
     {
       nome: 'Pop',
       rota: 'pop',
-      imagem: 'https://pbs.twimg.com/media/HSbyTzKWMAEbhWh?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/b3/10/97/b31097b67c5b8664379b800dcad3b6af.jpg',
       descricao: 'Os maiores hits do pop'
     },
     {
       nome: 'Rock/Metal',
       rota: 'rock-metal',
-      imagem: 'https://pbs.twimg.com/media/HQ3UjKHW0AA4wcI?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/73/ef/da/73efda8b093a5b1c6b9700d02f021769.jpg',
       descricao: 'O som pesado que revolucionou a música'
     },
     {
       nome: 'Indie/Alternativo',
       rota: 'indie-alternativo',
-      imagem: 'https://pbs.twimg.com/media/HQ3aFfKW0AAOVLw?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/4e/0f/db/4e0fdbd5028a200dd975dd3a87410141.jpg',
       descricao: 'Inovação e criatividade'
     },
     {
       nome: 'R&B',
       rota: 'r-b',
-      imagem: 'https://pbs.twimg.com/media/HQ3XA5mWkAALFja?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/c2/70/b8/c270b82b7cba50155a490aabc07cbb7b.jpg',
       descricao: 'A alma da música moderna'
     },
     {
       nome: 'MPB',
       rota: 'mpb',
-      imagem: 'https://pbs.twimg.com/media/HQ3RSnmWAAAPhGs?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/5f/b7/99/5fb799a57accd7edda4aa2b10dcd005d.jpg',
       descricao: 'A música popular brasileira'
     },
     {
       nome: 'Rap',
       rota: 'rap',
-      imagem: 'https://pbs.twimg.com/media/HQ3N2opXkAA6AOn?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/25/46/30/25463026d71d83a83d270c64ed872bca.jpg',
       descricao: 'Ritmo e Poesia'
     },
     {
       nome: 'K-Pop',
       rota: 'k-pop',
-      imagem: 'https://pbs.twimg.com/media/HRujKiPbcAAqz8H?format=png&name=900x900',
+      imagem: 'https://i.pinimg.com/736x/d7/db/9c/d7db9cce086efaaec94b679b674c713c.jpg', 
       descricao: 'O fenômeno da música pop coreana'
     }
   ];
@@ -110,9 +110,17 @@ export class VitrineComponent implements OnInit {
       return;
     }
 
-    const resultado = this.cestaService.adicionar(album);
-    this.mensagemSucesso = resultado.mensagem;
-    setTimeout(() => { this.mensagemSucesso = ''; }, 3000);
+    // Chama o serviço que envia para o banco
+    this.cestaService.adicionar(album);
+    
+    // Feedback visual no botão
+    album.adicionado = true;
+    this.mensagemSucesso = `${album.nome} adicionado!`;
+    
+    setTimeout(() => { 
+      this.mensagemSucesso = ''; 
+      album.adicionado = false;
+    }, 2000);
   }
 
   irParaLogin(): void {

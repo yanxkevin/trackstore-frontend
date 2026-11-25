@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ApiService } from '../../services/api'; // <-- IMPORTANDO A API
 
 @Component({
   selector: 'app-cadastro',
@@ -26,7 +27,8 @@ export class CadastroComponent {
   sucesso: string = '';
   erroGeral: string = '';
 
-  constructor(private router: Router) {}
+  // <-- INJETANDO O API SERVICE AQUI
+  constructor(private router: Router, private apiService: ApiService) {}
 
   // ========== GETTERS PARA VALIDAÇÃO EM TEMPO REAL ==========
   get temMinimo8(): boolean {
@@ -34,7 +36,7 @@ export class CadastroComponent {
   }
 
   get temMaximo20(): boolean {
-  return this.senha.length <= 20;
+    return this.senha.length <= 20;
   }
 
   get temMaiuscula(): boolean {
@@ -115,10 +117,10 @@ export class CadastroComponent {
 
   // ========== VALIDAR SENHA FORTE ==========
   validarSenhaForte(senha: string): boolean {
-  return this.temMinimo8 && this.temMaximo20 && this.temMaiuscula && this.temMinuscula && this.temNumero && this.temEspecial;
-}
+    return this.temMinimo8 && this.temMaximo20 && this.temMaiuscula && this.temMinuscula && this.temNumero && this.temEspecial;
+  }
 
-  // ========== CRIAR CONTA ==========
+  // ========== CRIAR CONTA (INTEGRADO COM O BACK-END) ==========
   criarConta(): void {
     // Limpar mensagens
     this.erros = {};
@@ -162,18 +164,8 @@ export class CadastroComponent {
       return;
     }
 
-    // Verificar se o e-mail já está cadastrado
-    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-    const emailExistente = usuarios.find((u: any) => u.email === this.email);
-
-    if (emailExistente) {
-      this.erroGeral = 'Este e-mail já está cadastrado!';
-      return;
-    }
-
-    // Criar novo usuário
+    // Criar o objeto para enviar ao Java (sem o ID, pois o banco gera)
     const novoUsuario = {
-      id: Date.now(),
       nome: this.nome.trim(),
       email: this.email,
       cpf: this.cpf,
@@ -181,27 +173,33 @@ export class CadastroComponent {
       senha: this.senha
     };
 
-    // Salvar no localStorage
-    usuarios.push(novoUsuario);
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    // Envia para o Back-end via HTTP POST
+    this.apiService.cadastrarCliente(novoUsuario).subscribe({
+      next: (res) => {
+        // Se deu certo (status 200 ou 201)
+        this.sucesso = 'Conta criada com sucesso!';
+        
+        // Limpar todos os campos
+        this.nome = '';
+        this.email = '';
+        this.cpf = '';
+        this.telefone = '';
+        this.senha = '';
+        this.confirmarSenha = '';
+        this.erros = {};
+        this.cadastroForm.resetForm();
 
-    // Mensagem de sucesso
-    this.sucesso = 'Conta criada com sucesso!';
-
-    // Limpar todos os campos
-    this.nome = '';
-    this.email = '';
-    this.cpf = '';
-    this.telefone = '';
-    this.senha = '';
-    this.confirmarSenha = '';
-    this.erros = {};
-    this.cadastroForm.resetForm();
-
-    // Redirecionar após 2 segundos
-    setTimeout(() => {
-      this.router.navigate(['/login']);
-    }, 2000);
+        // Redirecionar após 2 segundos
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err) => {
+        // Se o back-end retornar erro (ex: e-mail duplicado)
+        this.erroGeral = 'Erro ao cadastrar. Este e-mail já está em uso.';
+        console.error('Erro na API:', err);
+      }
+    });
   }
 
   // ========== NAVEGAR PARA LOGIN ==========

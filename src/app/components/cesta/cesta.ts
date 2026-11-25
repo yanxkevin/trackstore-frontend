@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { Album } from '../../models/album.model';
 import { CestaService } from '../../services/cesta';
+import { AlbumService } from '../../services/album';
 
 @Component({
   selector: 'app-cesta',
@@ -12,44 +12,64 @@ import { CestaService } from '../../services/cesta';
   styleUrls: ['./cesta.css']
 })
 export class CestaComponent implements OnInit {
-  itens: Album[] = [];
+  itens: any[] = [];
   total: number = 0;
 
   constructor(
-    private cestaService: CestaService,
+    public cestaService: CestaService,
+    private albumService: AlbumService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.carregarCesta();
+    // Escuta as mudanças no serviço para atualizar a tela na mesma hora
+    this.cestaService.contadorItens$.subscribe(() => {
+      this.carregarDadosVisuais();
+    });
+    
+    // Carrega os dados do banco na primeira vez que abre a tela
+    this.cestaService.carregarCesta();
   }
 
-  carregarCesta(): void {
-    this.itens = this.cestaService.getItens();
-    this.total = this.cestaService.getTotal();
+  carregarDadosVisuais(): void {
+    const pedidosDoBanco = this.cestaService.getItens();
+    this.total = 0;
+
+    // Cruza os dados do pedido (banco) com os dados do álbum (imagem, preço)
+    this.albumService.getAlbuns().subscribe(albuns => {
+      this.itens = pedidosDoBanco.map(pedido => {
+        const albumInfo = albuns.find(a => a.id === pedido.albumId);
+        const preco = albumInfo ? albumInfo.preco : 0;
+        const subtotal = preco * pedido.quantidade;
+        
+        this.total += subtotal;
+
+        return {
+          ...pedido,
+          imagem: albumInfo?.imagem,
+          artista: albumInfo?.artista,
+          genero: albumInfo?.genero,
+          preco: preco,
+          subtotal: subtotal // O subtotal já fica salvo aqui
+        };
+      });
+    });
   }
 
-  aumentar(id: number): void {
-    this.cestaService.aumentarQuantidade(id);
-    this.carregarCesta();
-  }
-
-  diminuir(id: number): void {
-    this.cestaService.diminuirQuantidade(id);
-    this.carregarCesta();
+  // ========== FUNÇÃO QUE ESTAVA FALTANDO ==========
+  getSubtotal(item: any): number {
+    return item.subtotal || 0;
   }
 
   remover(id: number): void {
     if (confirm('Deseja remover este álbum da cesta?')) {
       this.cestaService.remover(id);
-      this.carregarCesta();
     }
   }
 
   limparCesta(): void {
     if (confirm('Deseja limpar toda a cesta?')) {
       this.cestaService.limpar();
-      this.carregarCesta();
     }
   }
 
@@ -59,9 +79,8 @@ export class CestaComponent implements OnInit {
       return;
     }
 
-    alert(` Compra finalizada!\n\nTotal: R$ ${this.total.toFixed(2)}\n\nObrigado pela preferência!`);
+    alert(`🎉 Compra finalizada!\n\nTotal: R$ ${this.total.toFixed(2)}\n\nObrigado pela preferência!`);
     this.cestaService.limpar();
-    this.carregarCesta();
     this.router.navigate(['/']);
   }
 
@@ -69,11 +88,6 @@ export class CestaComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  getSubtotal(item: Album): number {
-    return this.cestaService.getSubtotal(item);
-  }
-
-  // ========== MÉTODO QUE FALTAVA! ==========
   getQuantidadeTotal(): number {
     return this.cestaService.getQuantidadeTotal();
   }

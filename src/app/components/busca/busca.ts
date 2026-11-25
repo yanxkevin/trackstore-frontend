@@ -21,7 +21,6 @@ export class BuscaComponent implements OnInit {
   buscou: boolean = false;
   mostrarSugestoes: boolean = false;
 
-  // ========== MENSAGENS ==========
   mensagemSucesso: string = '';
   mensagemErro: string = '';
 
@@ -34,16 +33,11 @@ export class BuscaComponent implements OnInit {
   ngOnInit(): void {
     this.albumService.getAlbuns().subscribe(data => {
       this.todosAlbuns = data;
-
-      // Restaurar busca salva
       const buscaSalva = localStorage.getItem('buscaSalva');
       if (buscaSalva) {
         const estado = JSON.parse(buscaSalva);
         this.termoBusca = estado.termoBusca || '';
-
-        if (this.termoBusca) {
-          this.onBuscar();
-        }
+        if (this.termoBusca) this.onBuscar();
       }
     });
   }
@@ -59,24 +53,17 @@ export class BuscaComponent implements OnInit {
     }
 
     const termo = this.termoBusca.toLowerCase().trim();
-
     this.resultados = this.todosAlbuns.filter(album =>
       album.nome.toLowerCase().includes(termo) ||
       album.artista.toLowerCase().includes(termo) ||
       album.genero.toLowerCase().includes(termo)
     );
 
-    this.salvarBusca();
-  }
-
-  salvarBusca(): void {
-    const estado = { termoBusca: this.termoBusca };
-    localStorage.setItem('buscaSalva', JSON.stringify(estado));
+    localStorage.setItem('buscaSalva', JSON.stringify({ termoBusca: this.termoBusca }));
   }
 
   onDigitar(): void {
     this.buscou = false;
-
     if (!this.termoBusca || this.termoBusca.trim() === '') {
       this.sugestoes = [];
       this.mostrarSugestoes = false;
@@ -86,22 +73,11 @@ export class BuscaComponent implements OnInit {
     }
 
     const termo = this.termoBusca.toLowerCase().trim();
+    const sAlbuns = this.todosAlbuns.filter(a => a.nome.toLowerCase().includes(termo)).map(a => a.nome);
+    const sArtistas = this.todosAlbuns.filter(a => a.artista.toLowerCase().includes(termo)).map(a => a.artista);
+    const sGeneros = this.todosAlbuns.filter(a => a.genero.toLowerCase().includes(termo)).map(a => a.genero);
 
-    const sugestoesAlbuns = this.todosAlbuns
-      .filter(album => album.nome.toLowerCase().includes(termo))
-      .map(album => album.nome);
-
-    const sugestoesArtistas = this.todosAlbuns
-      .filter(album => album.artista.toLowerCase().includes(termo))
-      .map(album => album.artista);
-
-    const sugestoesGeneros = this.todosAlbuns
-      .filter(album => album.genero.toLowerCase().includes(termo))
-      .map(album => album.genero);
-
-    const todasSugestoes = [...sugestoesAlbuns, ...sugestoesArtistas, ...sugestoesGeneros];
-    this.sugestoes = [...new Set(todasSugestoes)].slice(0, 8);
-
+    this.sugestoes = [...new Set([...sAlbuns, ...sArtistas, ...sGeneros])].slice(0, 8);
     this.mostrarSugestoes = this.sugestoes.length > 0;
   }
 
@@ -121,12 +97,10 @@ export class BuscaComponent implements OnInit {
   }
 
   fecharSugestoes(): void {
-    setTimeout(() => {
-      this.mostrarSugestoes = false;
-    }, 200);
+    setTimeout(() => { this.mostrarSugestoes = false; }, 200);
   }
 
-  // ========== ADICIONAR À CESTA COM MENSAGEM ==========
+  // ========== ADICIONAR À CESTA ==========
   adicionarCesta(album: Album): void {
     this.mensagemSucesso = '';
     this.mensagemErro = '';
@@ -140,8 +114,14 @@ export class BuscaComponent implements OnInit {
     }
 
     const resultado = this.cestaService.adicionar(album);
-    this.mensagemSucesso = resultado.mensagem;
-    setTimeout(() => { this.mensagemSucesso = ''; }, 3000);
+    
+    if (resultado.sucesso) {
+      this.mensagemSucesso = resultado.mensagem;
+      setTimeout(() => { this.mensagemSucesso = ''; }, 3000);
+    } else {
+      this.mensagemErro = resultado.mensagem;
+      setTimeout(() => { this.mensagemErro = ''; }, 5000);
+    }
   }
 
   irParaLogin(): void {
@@ -150,13 +130,8 @@ export class BuscaComponent implements OnInit {
 
   getCorGenero(genero: string): string {
     const cores: { [key: string]: string } = {
-      'Pop': '#ef007b',
-      'Rock/Metal': '#4ecdc4',
-      'Indie/Alternativo': '#a29bfe',
-      'R&B': '#1318c2',
-      'MPB': '#5ce7ad',
-      'Rap': '#1c1919',
-      'K-Pop': '#1a8ec8'
+      'Pop': '#ef007b', 'Rock/Metal': '#4ecdc4', 'Indie/Alternativo': '#a29bfe',
+      'R&B': '#1318c2', 'MPB': '#5ce7ad', 'Rap': '#1c1919', 'K-Pop': '#1a8ec8'
     };
     return cores[genero] || '#6c757d';
   }

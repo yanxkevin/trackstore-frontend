@@ -1,7 +1,8 @@
-/* ========== FUNDO ========== */
+/* ========== FUNDO DA PÁGINA (DEGRADÊ ROXO) ========== */
 :host {
   display: block;
   min-height: 100vh;
+  /* O degradê roxo original está de volta! */
   background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
   padding-bottom: 40px;
 }
@@ -50,6 +51,7 @@
   transform: scale(1.02);
 }
 
+/* ========== SUGESTÕES ========== */
 .sugestoes-container {
   position: absolute;
   top: 100%;
@@ -109,101 +111,71 @@
   }
 }
 
-/* ========== CARDS MENORES ========== */
+/* ========== CARDS ========== */
 .card {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  max-width: 130px;          /* ← MESMO TAMANHO DO GÊNERO */
-  margin: 0 auto 15px auto;  /* ← ESPAÇO EMBAIXO */
+  width: 100%;
+  max-width: 220px;
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* Capa do álbum */
 .card-img-top {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   display: block;
-  padding: 0;
-  margin: 0;
-  background: transparent;
 }
 
-/* Corpo do card */
 .card-body {
-  padding: 4px 6px 2px;
+  padding: 10px 12px 6px;
 }
 
 .card-title {
   font-weight: 700;
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   color: #1a1a2e;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .card-text {
-  font-size: 0.5rem;
-  margin-bottom: 1px;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
 }
 
 .card-text .badge {
-  font-size: 0.45rem;
-  padding: 1px 4px;
+  font-size: 0.65rem;
+  padding: 2px 6px;
 }
 
 .text-success {
   color: #2ecc71 !important;
   font-weight: bold;
-  font-size: 0.65rem;
+  font-size: 0.9rem;
 }
 
-/* Rodapé com botões */
 .card-footer {
-  padding: 2px 6px 4px;
+  padding: 6px 12px 10px;
   background: transparent;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .card-footer .btn {
-  font-size: 0.5rem;
-  padding: 1px 5px;
+  font-size: 0.75rem;
+  padding: 4px 10px;
 }
 
-.card-footer .btn i {
-  font-size: 0.5rem;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-  .card {
-    max-width: 110px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card {
-    max-width: 90px;
-  }
-
-  .card-title {
-    font-size: 0.5rem;
-  }
-
-  .card-text {
-    font-size: 0.45rem;
-  }
-}
 /* ========== RESPONSIVO ========== */
 @media (max-width: 768px) {
   .busca-input {
@@ -220,12 +192,7 @@
   }
 
   .card {
-    max-width: 160px;
-    margin: 0 auto;
-  }
-
-  .card-img-top {
-    height: 100px;
+    max-width: 200px;
   }
 }
 
@@ -241,14 +208,18 @@
   }
 
   .card {
-    max-width: 130px;
-  }
-
-  .card-img-top {
-    height: 80px;
+    max-width: 100%;
   }
 
   .card-title {
+    font-size: 0.8rem;
+  }
+
+  .card-text {
     font-size: 0.65rem;
+  }
+
+  .card-footer .btn {
+    padding: 2px 6px;
   }
 }

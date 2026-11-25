@@ -15,13 +15,12 @@ import { CestaService } from '../../services/cesta';
 export class GeneroComponent implements OnInit {
   genero: string = '';
   albuns: Album[] = [];
+  albunsAgrupados: Album[][] = []; 
   fundoImagem: string = '';
 
-  // ========== MENSAGENS ==========
   mensagemSucesso: string = '';
   mensagemErro: string = '';
 
-  // ========== IMAGENS DE FUNDO POR GÊNERO ==========
   fundos: { [key: string]: string } = {
     'pop': 'https://pbs.twimg.com/media/HQ74OsxWYAAf2BY?format=jpg&name=large',
     'rock-metal': 'https://pbs.twimg.com/media/HQ_ndW2X0AA39rx?format=jpg&name=large',
@@ -32,7 +31,6 @@ export class GeneroComponent implements OnInit {
     'k-pop': 'https://pbs.twimg.com/media/HR3ocLjbAAAX6Pk?format=jpg&name=large'
   };
 
-  // ========== CORES POR GÊNERO ==========
   cores: { [key: string]: string } = {
     'pop': '#ef007b',
     'rock-metal': '#4ecdc4',
@@ -72,16 +70,26 @@ export class GeneroComponent implements OnInit {
 
       const generoNome = mapaGeneros[this.genero] || '';
       this.albuns = data.filter(album => album.genero === generoNome);
+      
+      // Agrupa de 4 em 4 para o carrossel
+      this.albunsAgrupados = this.chunkArray(this.albuns, 4);
     });
+  }
+
+  chunkArray(array: any[], size: number): any[][] {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
   }
 
   voltar(): void {
     this.router.navigate(['/']);
   }
 
-  // ========== ADICIONAR À CESTA COM MENSAGEM ==========
+  // ========== ADICIONAR À CESTA ==========
   adicionarCesta(album: Album): void {
-    // Limpar mensagens anteriores
     this.mensagemSucesso = '';
     this.mensagemErro = '';
 
@@ -94,8 +102,14 @@ export class GeneroComponent implements OnInit {
     }
 
     const resultado = this.cestaService.adicionar(album);
-    this.mensagemSucesso = resultado.mensagem;
-    setTimeout(() => { this.mensagemSucesso = ''; }, 3000);
+    
+    if (resultado.sucesso) {
+      this.mensagemSucesso = resultado.mensagem;
+      setTimeout(() => { this.mensagemSucesso = ''; }, 3000);
+    } else {
+      this.mensagemErro = resultado.mensagem;
+      setTimeout(() => { this.mensagemErro = ''; }, 5000);
+    }
   }
 
   irParaLogin(): void {

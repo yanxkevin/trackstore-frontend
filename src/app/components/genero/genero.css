@@ -1,7 +1,8 @@
-/* ========== FUNDO RESPONSIVO ========== */
+/* ========== FUNDO ========== */
 :host {
-  display: block;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -10,7 +11,9 @@
 }
 
 .fundo-genero {
-  min-height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -20,7 +23,9 @@
 }
 
 .overlay {
-  min-height: 100vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: transparent;
   padding-bottom: 30px;
   padding-top: 10px;
@@ -56,117 +61,156 @@
   text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-/* ========== CARDS MENORES ========== */
+/* ========== CARDS ========== */
 .card {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 220px; /* Tamanho fixo no PC */
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
-/* Capa do álbum */
 .card-img-top {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   display: block;
-  padding: 0;
-  margin: 0;
-  background: transparent;
 }
 
-/* Corpo do card */
 .card-body {
-  padding: 4px 6px 2px;
+  padding: 10px 12px 6px;
 }
 
 .card-title {
   font-weight: 700;
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   color: #1a1a2e;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .card-text {
-  font-size: 0.5rem;
-  margin-bottom: 1px;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
 }
 
 .card-text .badge {
-  font-size: 0.45rem;
-  padding: 1px 4px;
+  font-size: 0.65rem;
+  padding: 2px 6px;
 }
 
 .text-success {
   color: #2ecc71 !important;
   font-weight: bold;
-  font-size: 0.65rem;
+  font-size: 0.9rem;
 }
 
-/* Rodapé com botões */
 .card-footer {
-  padding: 2px 6px 4px;
+  padding: 6px 12px 10px;
   background: transparent;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .card-footer .btn {
-  font-size: 0.5rem;
-  padding: 1px 5px;
+  font-size: 0.75rem;
+  padding: 4px 10px;
 }
 
-.card-footer .btn i {
-  font-size: 0.5rem;
+/* ========== SETAS DO CARROSSEL ========== */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  opacity: 0.9;
 }
 
-/* ========== RESPONSIVO - TABLET ========== */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  padding: 20px;
+  background-size: 45%;
+}
+
+/* ========== RESPONSIVO ========== */
 @media (max-width: 768px) {
-  :host {
-    background-attachment: scroll;
-  }
-
-  .fundo-genero {
+  :host, .fundo-genero {
     background-attachment: scroll;
     background-position: center top;
   }
 
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 10%;
+  }
+
+  /* Ajustes finos para o tablet */
   .card {
-    max-width: 110px;
+    max-width: 200px;
   }
 }
 
-/* ========== RESPONSIVO - CELULAR ========== */
 @media (max-width: 480px) {
-  :host {
-    background-attachment: scroll;
+  .titulo-genero h1 {
+    font-size: 2.5rem;
   }
 
-  .fundo-genero {
-    background-attachment: scroll;
-    background-position: center top;
-  }
-
+  /* No celular, os 2 cards dividem a tela, então removemos o max-width para eles se ajustarem à coluna */
   .card {
-    max-width: 90px;
+    max-width: 100%;
   }
-
+  
   .card-title {
-    font-size: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .card-text {
+    font-size: 0.65rem;
   }
 
-  .card-text {
-    font-size: 0.45rem;
+  .card-footer .btn {
+    padding: 2px 6px;
   }
+}
+/* Impede que as setas do carrossel bloqueiem o clique nos cards */
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 1 !important; /* Joga as setas para trás */
+}
+/* ========================================= */
+/* CORREÇÃO DO CARROSSEL E BOTÕES            */
+/* ========================================= */
+
+/* 1. Deixa a área de clique da seta bem fina e fixa nas bordas */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 40px !important; /* Tamanho fixo em pixels para não empurrar os cards */
+  z-index: 1000 !important; /* Fica acima de tudo para não sumir */
+}
+
+/* 2. Coloca o card acima de qualquer coisa invisível */
+.card {
+  position: relative;
+  z-index: 10 !important; 
+}
+
+/* 3. O SEGREDO: Coloca a área dos botões na frente de TUDO */
+.card-footer {
+  position: relative;
+  z-index: 9999 !important; /* Força o clique no botão */
+}
+
+/* 4. Garante que o botão de detalhes tenha o clique garantido */
+.card-footer .btn {
+  position: relative;
+  z-index: 10000 !important;
 }
